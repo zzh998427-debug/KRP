@@ -1,8 +1,8 @@
 {
   "log": {
-    "loglevel": "warning",  // 最小日志，无用户数据
-    "access": "",           // 无访问日志
-    "error": ""             // 无错误日志到盘
+    "loglevel": "warning",
+    "access": "",
+    "error": ""
   },
   "inbounds": [
     {
@@ -18,20 +18,23 @@
         "decryption": "none"
       },
       "streamSettings": {
-        "network": "tcp",
+        "network": "{{if eq .Protocol "ws"}}ws{{else}}tcp{{end}}",
+        "security": "{{if eq .Protocol "ws"}}none{{else}}reality{{end}}",
         {{- if eq .Protocol "ws"}}
-        "network": "ws",
         "wsSettings": {
-          "path": "/{{ randomPath }}"  // 随机路径
+          "path": "/ws{{.ShortID}}",
+          "headers": {
+            "Host": "{{.FakeDomain}}"
+          }
         },
         {{- end}}
-        "security": "reality",
+        {{- if ne .Protocol "ws"}}
         "realitySettings": {
           "show": false,
           "dest": "{{.FakeDomain}}:443",
           "xver": 0,
-          "serverNames": [{{ range $name := splitList "," .ServerNames }}"{{$name}}",{{end}}],
-          "privateKey": "{{ generatePrivateKey .PublicKey }}",  // 脚本生成对应私钥
+          "serverNames": [{{ range $i, $name := splitList "," .ServerNames }}{{- if $i}}, {{end}}"{{$name}}"{{end}}],
+          "privateKey": "{{.PrivateKey}}",
           "publicKey": "{{.PublicKey}}",
           "minClientVer": "",
           "maxClientVer": "",
@@ -44,6 +47,7 @@
             "spiderX": ""
           }
         },
+        {{- end}}
         "tcpSettings": {
           "acceptProxyProtocol": false,
           "header": {
