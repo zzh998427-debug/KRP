@@ -1,0 +1,35 @@
+# fly.toml - Fly.io 配置
+
+app = "your-app-name-here"  # 改成你的应用名（小写字母+数字+-，如 koyeb-proxy-zh）
+primary_region = "iad"      # 推荐 Ashburn 附近（Virginia），低延迟；可选 sjc/lax 等
+
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+
+[build]
+  # 自动使用根目录 Dockerfile 构建
+
+[env]
+  PORT = "443"              # 固定内部端口
+  FALLBACK_PROTO = "ws"     # 强制 WS 回退（必须！Reality 在 Fly 不兼容）
+  FINGERPRINT = "chrome"    # 可改
+  FAKE_DOMAIN = "www.microsoft.com"  # WS 不需，但保留
+
+[http_service]
+  internal_port = 443
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1  # 保持常运行
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 443
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]     # HTTP 重定向到 HTTPS
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]  # Edge 自动 TLS 终止
