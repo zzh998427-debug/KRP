@@ -1,6 +1,6 @@
 # fly.toml - Fly.io 配置
 
-app = "your-app-name-here"  # 改成你的应用名（小写字母+数字+-，如 koyeb-proxy-zh）
+app = "GG-KRP-2026"  # 改成你的应用名（小写字母+数字+-，如 koyeb-proxy-zh）
 primary_region = "iad"      # 推荐 Ashburn 附近（Virginia），低延迟；可选 sjc/lax 等
 
 kill_signal = "SIGINT"
